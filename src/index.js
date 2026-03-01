@@ -1,0 +1,26 @@
+import express from 'express'
+import dotenv from 'dotenv'
+import restaurantRoutes from './api/restaurants.js'
+import drivers from './api/drivers.js'
+import customers from './api/customers.js'
+
+dotenv.config()
+
+const app = express()
+const PORT = process.env.PORT || 3000
+
+app.use(express.json())
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'ok' })
+})
+
+app.use('/restaurants', restaurantRoutes)
+app.use('/drivers', drivers)
+app.use("/customers", customers)
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`)
+})
+
+export default app
