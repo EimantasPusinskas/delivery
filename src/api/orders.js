@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import prisma from '../db.js'
 import { findNearestDriver } from '../matching/matcher.js'
+import { io } from '../index.js'
 
 const router = Router()
 
@@ -32,6 +33,13 @@ router.post('/place', async(req, res) => {
             where: {id: driver.id}, 
             data: {available: false},
         });
+
+        io.to(driver.id).emit('order_assigned', {
+            orderId: order.id, 
+            items: order.items, 
+            price: order.price, 
+            restaurantId: order.restaurantId
+        })
 
         res.status(201).json(order)
     } catch (error) {
