@@ -3,6 +3,7 @@ import dotenv from 'dotenv'
 import restaurantRoutes from './api/restaurants.js'
 import drivers from './api/drivers.js'
 import customers from './api/customers.js'
+import orderRoutes from './api/orders.js'
 
 dotenv.config()
 
@@ -18,6 +19,7 @@ app.get('/health', (req, res) => {
 app.use('/restaurants', restaurantRoutes)
 app.use('/drivers', drivers)
 app.use("/customers", customers)
+app.use('/orders', orderRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
