@@ -32,4 +32,25 @@ router.get('/', async (req, res) => {
   }
 })
 
+router.patch('/:id/availability', async (req, res) => {
+  const { id } = req.params
+  const { available } = req.body
+
+  if (typeof available != 'boolean') {
+    return res.status(400).json({error: 'available must be a boolean'})
+  }
+  
+  try{
+    const driver = await prisma.driver.update({
+      where:  { id },
+      data:   { available },
+    })
+    res.status(200).json(updateDriverStatus)
+  } catch(error) {
+    res.status(500).json({ error: 'Internal server error' })
+  }
+
+
+})
+
 export default router
