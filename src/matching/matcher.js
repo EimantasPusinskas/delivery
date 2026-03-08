@@ -1,5 +1,6 @@
 import prisma from "../db.js";
 import {haversine} from "./haversine.js";
+import { getLocation } from "../location/locationStore.js";
 
 
 async function findNearestDriver(restaurantLat, restaurantLng) {
@@ -11,10 +12,18 @@ async function findNearestDriver(restaurantLat, restaurantLng) {
         if (drivers.length === 0) return null;
 
         let nearestDriver = drivers[0];
-        let minDistance = haversine(restaurantLat, restaurantLng, drivers[0].lat, drivers[0].lng);
+        const firstFreshLocation = getLocation(drivers[0].id)
+        const firstLat = firstFreshLocation ? firstFreshLocation.lat : drivers[0].lat
+        const firstLng = firstFreshLocation ? firstFreshLocation.lng : drivers[0].lng
+
+        let minDistance = haversine(restaurantLat, restaurantLng, firstLat, firstLng);
 
         for (let i = 1; i < drivers.length; i++) {
-            const distance = haversine(restaurantLat, restaurantLng, drivers[i].lat, drivers[i].lng);
+            const freshLocation = getLocation(drivers[i].id)
+            const lat = freshLocation ? freshLocation.lat : drivers[i].lat
+            const lng = freshLocation ? freshLocation.lng : drivers[i].lng
+
+            const distance = haversine(restaurantLat, restaurantLng, lat, lng);
             if (distance < minDistance) {
                 minDistance = distance;
                 nearestDriver = drivers[i];

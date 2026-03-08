@@ -23,3 +23,13 @@ socket.on('order_update', (update) => {
 socket.on('disconnect', () => {
   console.log('Disconnected')
 })
+
+// simulate driver moving every 5 seconds
+setInterval(() => {
+    socket.emit('location_update', {
+        driverId: driverId,
+        lat: 53.349805 + (Math.random() * 0.01),
+        lng: -6.26031 + (Math.random() * 0.01)
+    })
+    console.log('Location update emitted')
+}, 5000)
