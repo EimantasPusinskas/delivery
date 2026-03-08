@@ -3,6 +3,15 @@ import prisma from '../db.js'
 
 const router = Router()
 
+router.get('/', async (req, res) => {
+  try {
+    const drivers = await prisma.driver.findMany()
+    res.json(drivers)
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' })
+  }
+})
+
 router.post('/register', async (req, res) => {
   const { name, email, lat, lng } = req.body
 
@@ -23,15 +32,6 @@ router.post('/register', async (req, res) => {
   }
 })
 
-router.get('/', async (req, res) => {
-  try {
-    const drivers = await prisma.driver.findMany()
-    res.json(drivers)
-  } catch (error) {
-    res.status(500).json({ error: 'Internal server error' })
-  }
-})
-
 router.patch('/:id/availability', async (req, res) => {
   const { id } = req.params
   const { available } = req.body
@@ -45,7 +45,7 @@ router.patch('/:id/availability', async (req, res) => {
       where:  { id },
       data:   { available },
     })
-    res.status(200).json(updateDriverStatus)
+    res.status(200).json(driver)
   } catch(error) {
     res.status(500).json({ error: 'Internal server error' })
   }

@@ -5,6 +5,15 @@ import { io } from '../index.js'
 
 const router = Router()
 
+router.get("/", async(req, res) => {
+    try {
+        const orders = await prisma.order.findMany()
+        res.json(orders)
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' })
+    }
+})
+
 router.post('/place', async(req, res) => {
     const { customerId, restaurantId, items, price } = req.body;
 
@@ -46,14 +55,30 @@ router.post('/place', async(req, res) => {
         console.error(error);
         res.status(500).json({error: 'Internal server error'})
     }   
-    
 })
 
-router.get("/", async(req, res) => {
+router.patch('/:id/status', async(req, res) => {
+    const { id } = req.params
+    const { status } = req.body
+
+    const validStatuses = ['CLAIMED', 'PICKED_UP', 'DELIVERED', 'DISPUTED']
+
+    if (!validStatuses.includes(status)) {
+        return res.status(400).json({ error: 'Invalid status' })
+    }
+
     try {
-        const orders = await prisma.order.findMany()
-        res.json(orders)
-    } catch (error) {
+        const order = await prisma.order.update({
+            where:  { id }, 
+            data:   { status },
+        })
+
+        io.to(order.customerId).emit('order_update', {
+            orderId: order.id, 
+            status: order.status
+        })
+        res.status(200).json(order)
+    } catch(error) {
         res.status(500).json({ error: 'Internal server error' })
     }
 })
