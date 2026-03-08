@@ -34,6 +34,11 @@ io.on('connection', (socket) => {
     console.log(`Driver ${driverId} registered on socket ${socket.id}`)
   })
 
+  socket.on('register_customer', (customerId) => {
+    socket.join(customerId)
+    console.log(`Customer ${customerId} registered`)
+})
+
   socket.on('disconnect', () =>{
     console.log(`Client disconnected: ${socket.id}`)
   })
