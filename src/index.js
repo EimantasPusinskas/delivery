@@ -6,6 +6,7 @@ import restaurantRoutes from './api/restaurants.js'
 import drivers from './api/drivers.js'
 import customers from './api/customers.js'
 import orderRoutes from './api/orders.js'
+import { updateLocation } from './location/locationStore.js'
 
 dotenv.config()
 
@@ -37,7 +38,12 @@ io.on('connection', (socket) => {
   socket.on('register_customer', (customerId) => {
     socket.join(customerId)
     console.log(`Customer ${customerId} registered`)
-})
+  })
+
+  socket.on('location_update', ({ driverId, lat, lng }) => {
+    updateLocation(driverId, lat, lng)
+    console.log(`Location updated for driver ${driverId}: ${lat}, ${lng}`)
+  })
 
   socket.on('disconnect', () =>{
     console.log(`Client disconnected: ${socket.id}`)
