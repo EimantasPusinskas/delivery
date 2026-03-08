@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import prisma from '../db.js'
+import { validateFields } from '../middleware/validate.js'
 
 const router = Router()
 
@@ -12,12 +13,8 @@ router.get('/', async (req, res) => {
   }
 })
 
-router.post('/register', async (req, res) => {
+router.post('/register', validateFields(['name', 'email', 'lat', 'lng']) , async (req, res) => {
   const { name, email, lat, lng } = req.body
-
-  if (!name || !email || !lat || !lng) {
-    return res.status(400).json({ error: 'All fields are required' })
-  }
 
   try {
     const driver = await prisma.driver.create({
